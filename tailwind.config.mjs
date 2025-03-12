@@ -7,11 +7,10 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      fontFamily: {
+        rockSalt: ['"Rock Salt"', 'sans-serif'], 
       },
     },
   },
   plugins: [],
-};
+}
