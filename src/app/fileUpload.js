@@ -20,6 +20,8 @@ const FileUpload = () => {
     const [fpred, setFpred] = useState(null);
     const [probability, setProbability] = useState(null);
     const[csv,setCsv] = useState(null);
+    const[color,setColor] = useState("bg-gray-100");
+
 
 
 
@@ -87,6 +89,7 @@ if (file.type != "text/csv"){
 
 
             setMessage('File uploaded successfully!');
+            setColor("bg-purple-700")
             setFile(true);
             setCsv(true);
         } catch (err) {
@@ -113,11 +116,11 @@ if (file.type != "text/csv"){
     
 
     return (
-        <div className='flex my-auto
+        <div className='flex my-auto text-black'
         
-        '>
-        <div className="flex flex-col items-center font-inter  text-center">
-            <div className=' w-128 h-128 flex containe flex-col justify-center items-center bg-purple-300'>
+        >
+        <div className="flex flex-col items-center font-inter   text-center">
+            <div className=' w-128 h-128 flex containe flex-col justify-center items-center bg-purple-400'>
       
   
         
@@ -130,28 +133,29 @@ if (file.type != "text/csv"){
          
       
         <input type="file" onChange={onFileChange} />
-            <button className= " focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" 
+            <button className= " focus:outline-none text-black bg-white-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" 
             onClick={onFileUpload}>Upload</button>
             
          
 
        
-<div className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">
+<div className={`focus:outline-none text-white ${color} hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900`}>
+
    
          
        
-      <button type = 'submit'  onClick = {nextPage}
+      <button  type = 'submit'  onClick = {nextPage}
       
       >Begin Initial EDA</button>
        
-      
+       </div>
       </div>
       <p>Status: {message}</p>
 
 
 
        
-        </div>
+    
         </div>
         </div>
     

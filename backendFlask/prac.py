@@ -13,8 +13,10 @@ from flask_cors import CORS
 from alter import DataDig
 from flask import Flask, render_template, url_for, request, jsonify,session
 import json
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-df = pd.read_csv('/Users/agastyamishra/eda-analysis/backendFlask/__pycache__/US-National-Parks_RecreationVisits_1979-2023.csv')
+df = pd.read_csv('/Users/agastyamishra/Downloads/Crime_Data_from_2020_to_Present.csv')
 cat_col = []
 types = df.dtypes
 columns = list(df.columns)
@@ -24,7 +26,6 @@ columns = list(df.columns)
 
 for index,type in enumerate(types):
     if type != 'int64' and type != 'float':
-        print(type)
         cat_col.append(index) 
     num_dict = {}
 
@@ -34,10 +35,14 @@ for index,type in enumerate(types):
     else:
             num_dict[columns[column]] = 'Numerical'
     num_dictJSON = json.dumps(num_dict,indent = 4)
-    
-print(df.head(5))
-   
 
+describe = df.describe()
+describe = describe.to_json(orient = 'records')
+corr_matrix = df.corr(numeric_only=True)
+top_5 = (corr_matrix.abs().unstack().sort_values(ascending=False).drop_duplicates())
+        
+topCorr= top_5[top_5 < 1].head(5)
+print(topCorr.index)
 
 
 
