@@ -143,7 +143,7 @@ def check():
 )
         top_corr_pairs =top_corr.index.tolist()
         top_corr_pairs =  top_corr_pairs[0:4]
-        top_corr_pairs = [f"{a} & {b}" for (a, b) in top_corr_pairs]
+        top_corr_pairs = [f"{a} & {b} : {c:.3f}" for (a, b), c in top_corr.items()]
 
 
         response = jsonify({

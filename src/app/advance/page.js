@@ -20,6 +20,8 @@ import { Dropdown } from "bootstrap";
 export default function(){
     const[loading,setLoading] = useState(false);
     const [csvString,setCsvString] = useState(null);
+          const router = useRouter();
+    
 console.log("yo");
 
 
@@ -59,26 +61,62 @@ console.log("error")
     }
     //Lets add a streamlit component to visualize all columns in dataset. and allow for outlier caluculations>
 
+
+    const regress = () => {
+      
+          
+          
+        router.push('/regression');
+
+  }
+
+
+  const classify = () =>{
+
+router.push('/classify')
+
+
+
+  }
     return(      
         
         
         
         
-        <div className=" justify-center text-white bg-slate-800">
+        <div className=" text-white bg-slate-800">
 {/* <BarChart/> */}
 
 <div className="container flex flex-col items-center mt-10">
 
 
-        <p className="font-bold text-xl">Click here to start download</p>
+        <p className="font-bold text-xl">Click here to start download of cleaned file.</p>
 
         <button onClick = {getData} className= " focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
 
         Download Cleaned File
 </button>
+<div className="h-px bg-white w-full my-4" />
 
+<div className="mt-10 container flex items-center ml-10">
+    <div>
+    <h1>Run an exploratory model on your data in seconds.</h1>
+    <a href = "/help" className="size-sm">(What does this mean?)</a>
+    </div>
+<button onClick = {regress} className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
+Regression?
+</button>
+<button onClick = {classify} href = 'classify' className= " ml-5 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
+Classification?
 
+</button>
 </div>
+<div className="h-20"></div>
+<div className="h-px bg-white w-full my-4" />
+
+<h4>Got another dataset?</h4>
+<a href = '/' >Go back home here</a>
+</div>
+
 
 
 

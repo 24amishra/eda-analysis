@@ -196,6 +196,12 @@ useEffect(() => {
 
   
 }, []);
+useEffect(() => {
+  if (digit && digit.length > 0 && !visible) {
+    setVisible(digit[0]);
+  }
+}, [digit]);
+
 
 useEffect(() => {
     const observer = new IntersectionObserver(
@@ -248,7 +254,8 @@ if (error){
     
     <div>
     <p className="text-black size-lg">Something went wrong {error}
-    
+    <a href = '/' >Go back home here</a>
+
 
     </p>
      <a>
@@ -309,7 +316,8 @@ if (error){
     return( 
        
 
-        <div className=" justify-center text-white bg-slate-800">
+        <div className=" justify-center mb-100
+         text-white bg-slate-800">
            <main className={inter.className}>
 
            <motion.header
@@ -464,12 +472,13 @@ viewport={{ once: true ,amount:0.5}}
   transition={{ duration: 0.6 }}
   viewport={{ once: true ,amount:0.1}}
 
-  className="bg-gray-100 hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg text-black flex justify-between items-center"
+  className="bg-gray-100 hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg text-black flex justify-between mb-10 items-center"
 
   >
          
         
           {pair[0]}
+       
       
         </motion.li>
         <motion.li
@@ -478,7 +487,7 @@ viewport={{ once: true ,amount:0.5}}
   transition={{ duration: 0.6 }}
   viewport={{ once: true,amount:0.7 }}
 
-  className="bg-white hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg text-black flex justify-between items-center"
+  className="bg-white hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg mb-10 text-black flex justify-between items-center"
 
   >
          {pair[1]}
