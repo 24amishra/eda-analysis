@@ -28,11 +28,12 @@ export default function Home() {
   return (
     
     
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-white   text-white">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></link>      
-    <div className = "topnav text-lg  bg-white ">
+    <div className= "  bg-slate-800 grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]    ">
 
-<div className="font-inter text-xl text-black  font-bold">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></link>      
+    <div className = "topnav text-lg  ">
+
+<div className=" min-h-screen  font-inter text-xl font-bold">
     <TypeAnimation
       sequence={["Automate EDA", 2000, "Enter a CSV dataset!", 2000]}
       speed={50}
@@ -47,9 +48,9 @@ export default function Home() {
 
 
 
-
-
 </div>
+
+
 
     <FileUpload/>
     </div>

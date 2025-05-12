@@ -11,7 +11,7 @@ body {
 }
 
 :root {
-  --background: #ffffff;
+  --background: rgb(30 41 59);;
   --foreground: #171717;
 }
 
@@ -28,7 +28,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 .topnav{
-  background-color: rgb(255, 255, 255);
   overflow: hidden;
   padding: 10px;
 
@@ -37,7 +36,7 @@ body {
 
 .topnav a {
   float: left;
-  color: rgb(255, 255, 255);
+  color: rgb(30 41 59);;
   padding: 14px 16px;
   text-decoration: none;
 }
@@ -46,10 +45,10 @@ body {
 
 .topnav a:hover{
   color: black;
-  background-color: antiquewhite;
+  background-color: rgb(30 41 59);;
 
 }
 .topnav a.active{
 background-color:purple ;
-color: white;
+color: rgb(30 41 59);;
 }

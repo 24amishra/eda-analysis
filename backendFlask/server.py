@@ -16,7 +16,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 import io
 import base64
-
+import numpy as np
+from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+from flask import session
 
 
 app = Flask(__name__)
@@ -24,6 +28,8 @@ app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"], supports_credentials=True,
   allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "OPTIONS"])
 file_storage = {}
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True  # Only if using HTTPS
 
 app.secret_key = 'i2jwfi'  
 matplotlib.use('Agg')
@@ -188,7 +194,10 @@ def image():
    
         corr_matrix = df.corr(numeric_only=True)
         plt.figure(figsize=(8, 6))  # Adjust figure size
-        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+        mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+   
+
+        sns.heatmap(corr_matrix, mask=mask,annot=False, cmap='coolwarm', fmt=".2f", linewidths=0.5)
        
 
 # Show the plot
@@ -302,11 +311,86 @@ def graph():
 
 
 
+
+@app.route('/columns',methods = ['POST','GET'])
+def drop():
+    file_data = file_storage.get('file')
+
+
+    df = pd.read_csv(BytesIO(file_data))
+  
+
+    df = df.loc[:, df.isnull().mean() < 0.4]
+    data =  request.get_json()
+    var1 = data.get("var1")
     
+
+ 
+    
+    split_ratio_str = data.get("split")
+    
+    if not var1 or not split_ratio_str:
+        return jsonify({"error": "Missing 'var1' or 'split'"}), 400
+    
+    split_ratio = int(split_ratio_str.split('-')[0]) / 100.0
+    session['target'] = var1
+    session['split_ratio'] = split_ratio
+    print("THIS IS TARGET")
+    print(var1)
+    
+    if var1 not in df.columns:
+        return jsonify({"error": f"Target '{var1}' not found in dataset"}), 400
+        file_data = file_storage.get('file')
+
+
+    df = pd.read_csv(BytesIO(file_data))
+    # Read file and form data
+    target = session.get('target')
+    print("WHAT IS TARGET")
+    
+    if target is None:
+        return jsonify({"error": "Target variable is not set. Please select a target variable first."}), 400
+
+    split_ratio = session.get('split_ratio')
+    if split_ratio is None:
+        return jsonify({"error": "Split ratio is not set. Please provide a split ratio."}), 400
+    
+    for col in df.columns:
+        if df[col].dtype != 'int64' and df[col].dtype != 'float':
+            df = df.drop(columns=col)
+
+    y = df[target]
+    X = df.drop(columns=[target])
+   
+    regressor = DecisionTreeRegressor(random_state=0)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1 - split_ratio, random_state=42)
+
+    regressor.fit(X_train, y_train)
+    scores = cross_val_score(regressor, X, y, cv=10)
+    y1 = regressor.predict(X_test)
+    print(y1)
+    y1 =  y1.tolist()
+    y_test = y_test.tolist() 
+
+    prediction = [{'x': y1[val],'y' : y_test[val]} for val in range(0,len(y1))]
+   
+
+    return jsonify({
+        "cross_val_scores": scores.tolist(),
+        "mean_score": scores.mean(),
+        "prediction": prediction,
+        
+    })
    
 
 
+
+
     
+@app.route('/regress', methods=['POST','GET'])
+def regressor():
+    pass
 
 
 

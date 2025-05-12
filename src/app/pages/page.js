@@ -348,7 +348,7 @@ if (error){
     </main>
      
 
- <div className="container flex justify-center outline-black mt-10">
+ <div className="container flex flex-col justify-center outline-black mt-10">
 
 
 
@@ -365,10 +365,7 @@ if (error){
  
     Distribution Details: Numerical Columns
     </motion.h1>
-    </div>
-    
-    <div className="container flex flex-col items-center mt-10">
-  <motion.select
+    <motion.select
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.6 }}
@@ -387,6 +384,11 @@ if (error){
       </option>
     ))}
   </motion.select>
+    </div>
+
+    
+    <div className="container flex flex-row items-center mt-10">
+  
 
   
   <div style={{ padding: '16px' }}>
@@ -397,7 +399,7 @@ if (error){
   ))}
 </div>
 
-  <motion.table
+<motion.table
     className="border-collapse border border-gray-400"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -422,6 +424,7 @@ if (error){
     </tbody>
   </motion.table>
 </div>
+
 
 
 <div className="h-20"/>
@@ -472,12 +475,12 @@ viewport={{ once: true ,amount:0.5}}
   transition={{ duration: 0.6 }}
   viewport={{ once: true ,amount:0.1}}
 
-  className="bg-gray-100 hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg text-black flex justify-between mb-10 items-center"
+  className="0 transition rounded-md px-4 py-2 text-lg text-white flex justify-between mb-10 items-center"
 
   >
          
         
-          {pair[0]}
+          1. {pair[0]}
        
       
         </motion.li>
@@ -487,10 +490,10 @@ viewport={{ once: true ,amount:0.5}}
   transition={{ duration: 0.6 }}
   viewport={{ once: true,amount:0.7 }}
 
-  className="bg-white hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg mb-10 text-black flex justify-between items-center"
+  className=" transition rounded-md px-4 py-2 text-lg mb-10 text-white flex justify-between items-center"
 
   >
-         {pair[1]}
+        2.  {pair[1]}
      
        </motion.li>
        <motion.li
@@ -499,10 +502,10 @@ viewport={{ once: true ,amount:0.5}}
   transition={{ duration: 0.6 }}
   viewport={{ once: true,amount:0.7 }}
 
-  className="bg-gray-100 hover:bg-gray-200 transition rounded-md px-4 py-2 text-lg text-gray-700 flex justify-between items-center"
+  className=" transition rounded-md px-4 py-2 text-lg text-white flex justify-between items-center"
 
   >
-         {pair[2]}
+        3.  {pair[2]}
      
        </motion.li>
       

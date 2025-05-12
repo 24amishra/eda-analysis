@@ -7,7 +7,7 @@ import { Chart } from "chart.js";
 import Results from "../results/result"
 import { useState,useEffect,useRef } from "react";
 import { useRouter } from 'next/navigation'
-import {Table} from 'react-bootstrap';
+import {Modal, Table} from 'react-bootstrap';
 import Head from "next/head";
 import { Rock_Salt } from "next/font/google";
 import { Inter } from "next/font/google";
@@ -16,13 +16,17 @@ import { motion } from "motion/react"
 import Spinner from "../load";
 import { ClipLoader } from "react-spinners";
 import { Dropdown } from "bootstrap";
+import Example from "../modal";
 
 export default function(){
     const[loading,setLoading] = useState(false);
     const [csvString,setCsvString] = useState(null);
+
+    const [popup,setPopup] = useState(false);
+    const [state,setState ] = useState(0)
           const router = useRouter();
     
-console.log("yo");
+
 
 
   
@@ -83,44 +87,64 @@ router.push('/classify')
         
         
         
-        <div className=" text-white bg-slate-800">
-{/* <BarChart/> */}
+<div className="min-h-screen bg-slate-800 text-white">
+  <div className="container mx-auto flex flex-col items-center px-4 py-12 space-y-10">
 
-<div className="container flex flex-col items-center mt-10">
-
-
-        <p className="font-bold text-xl">Click here to start download of cleaned file.</p>
-
-        <button onClick = {getData} className= " focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
-
+    <div className="text-center space-y-4">
+      <p className="text-2xl font-semibold">
+        Click below to download your cleaned file.
+      </p>
+      <button
+        onClick={getData}
+        className="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-6 py-3 transition duration-200"
+      >
         Download Cleaned File
-</button>
-<div className="h-px bg-white w-full my-4" />
-
-<div className="mt-10 container flex items-center ml-10">
-    <div>
-    <h1>Run an exploratory model on your data in seconds.</h1>
-    <a href = "/help" className="size-sm">(What does this mean?)</a>
+      </button>
     </div>
-<button onClick = {regress} className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
-Regression?
-</button>
-<button onClick = {classify} href = 'classify' className= " ml-5 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
-Classification?
 
-</button>
+    <hr className="w-full border-white" />
+
+    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 px-4">
+      <div>
+        <h1 className="text-lg font-semibold">
+          Run an exploratory model on your data in seconds.
+        </h1>
+        <button onClick  = {() => {
+    setPopup(true);  
+    setState(1);   }
+
+
+        }className="text-sm underline text-blue-300">
+          (What does this mean?)
+        </button>
+        <Example isVisible={popup} onClose = {() => setPopup(false)} whichState = {state} />
+      </div>
+      <div className="flex gap-4">
+        <button
+          onClick={regress}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition duration-200"
+        >
+          Regression
+        </button>
+        <button
+          onClick={classify}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition duration-200"
+        >
+          Classification
+        </button>
+      </div>
+    </div>
+
+    <hr className="w-full border-white" />
+
+    <div className="text-center space-y-2">
+      <h4 className="text-md">Got another dataset?</h4>
+      <a href="/" className="text-blue-400 underline">
+        Go back home here
+      </a>
+    </div>
+  </div>
 </div>
-<div className="h-20"></div>
-<div className="h-px bg-white w-full my-4" />
 
-<h4>Got another dataset?</h4>
-<a href = '/' >Go back home here</a>
-</div>
-
-
-
-
-        </div>
-    )
-
+    );
 }

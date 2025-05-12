@@ -24,14 +24,6 @@ const FileUpload = () => {
 
 
 
-
-
-
-
-
-
-
-
     // Handle file selection
     const onFileChange = (event) => {
         setFile(event.target.files[0]);
@@ -72,22 +64,7 @@ if (file.type != "text/csv"){
             const output = await res.json()
             console.log(output);
 
-            
           
-           
-
-              
-              
-          
-              
-
-
- 
-
-
-            
-
-
             setMessage('File uploaded successfully!');
             setColor("bg-purple-700")
             setFile(true);
@@ -116,21 +93,15 @@ if (file.type != "text/csv"){
     
 
     return (
-        <div className='flex my-auto text-black'
+        <div className='flex my-auto       min-h-screen bg-slate-800
+ text-white'
         
         >
         <div className="flex flex-col items-center font-inter   text-center">
             <div className=' w-128 h-128 flex containe flex-col justify-center items-center bg-purple-400'>
       
   
-        
-            
-
-
-
-        
-             
-         
+    
       
         <input type="file" onChange={onFileChange} />
             <button className= " focus:outline-none text-black bg-white-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" 

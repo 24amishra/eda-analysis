@@ -4,16 +4,31 @@
 
 // see https://tailwindui.com/components/application-ui/overlays/modal-dialogs
 //for more information on the modal code structure
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 
 
 
-const Example = ({isVisible,onClose,setMessage}) =>{
+const Example = ({isVisible,onClose,message}) =>{
   const [open, setOpen] = useState(true)
+    const [detail,setDetail] = useState("y");
 
 
-console.log(setMessage)
+    useEffect(() => {
+      switch (message) {
+        case 1:
+          setDetail('Risk/Fraud Tech Intern under Joe Burling.');
+          break;
+        case 2:
+          setDetail('Work on maintaining and updating club website, participating in board meetings, and helping drive club growth. Utilized Tailwind, Astro, and React.');
+          break;
+        default:
+          setDetail('');
+      }
+    }, [message]);
+
+
+
 
  
 
@@ -46,11 +61,13 @@ console.log(setMessage)
                 
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <DialogTitle as="h3" className="text-base font-semibold text-gray-900">
-                {setMessage}
+                Description 
                   </DialogTitle>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                    {setMessage}
+                   Classification works best for binary data. If your data has columns with distinct states (0 1 2, etc), then classification may work best. 
+                   Regression is mainly used for predicting continious values, such as house prices. For more information, check here:
+                   <a href  = ' kit-learn.org/stable/'></a>
 
 
                     </p>
