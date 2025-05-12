@@ -323,6 +323,8 @@ def drop():
     df = df.loc[:, df.isnull().mean() < 0.4]
     data =  request.get_json()
     var1 = data.get("var1")
+    depth = data.get('depth')
+    sample = data.get('sample')
     
 
  
@@ -362,7 +364,7 @@ def drop():
     y = df[target]
     X = df.drop(columns=[target])
    
-    regressor = DecisionTreeRegressor(random_state=0)
+    regressor = DecisionTreeRegressor(max_depth = depth,random_state = 0,min_samples_split=sample)
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1 - split_ratio, random_state=42)
 

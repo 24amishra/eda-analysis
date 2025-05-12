@@ -25,6 +25,10 @@ export default function Regress() {
   const[lin,setLin] = useState(null);
    const [popup,setPopup] = useState(false);
       const [state,setState ] = useState(0)
+      const [depth,setDepth ] = useState(null);
+      const[sample,setSample] = useState(2);
+
+      
 
 const router = useRouter();
 const getData = async () => {
@@ -84,7 +88,7 @@ const getData = async () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ var1, split }),
+        body: JSON.stringify({ var1, split,depth,sample }),
       });
 
        
@@ -150,7 +154,7 @@ setSelect(true);
   
     console.log("Sending to backend:", { var1, split });
 
-    setLoading(true);
+    // setLoading(true);
 await getModel();
 
 //router.push('/eval');
@@ -266,7 +270,55 @@ className="container flex flex-col items-center mt-10">
 
         {split} % selected.
 
-        Click below to begin the 2 variable regression: 
+
+
+        <p>Select Hyperparameters</p>
+
+
+     <p>Max Depth</p>
+        <motion.select
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true, amount: 1 }}
+          onChange = {(e) => setDepth(e.target.value)}
+          className="mb-4 ml px-4 py-2 border rounded-lg bg-gray-500 shadow-md focus:outline-none"
+
+        >
+<option>None</option>
+<option>5</option>
+<option>10</option>
+
+
+          </motion.select>
+      <p>   Min Sample Split</p> 
+      <motion.select
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true, amount: 1 }}
+          onChange = {(e) => setSample(e.target.value)}
+          className="mb-4 ml px-4 py-2 border rounded-lg bg-gray-500 shadow-md focus:outline-none"
+
+        >
+<option>2</option>
+<option>0.01</option>
+<option>0.05</option>
+<option>0.1</option>
+<option>10</option>
+
+
+          </motion.select>
+
+
+
+
+
+
+
+
+
+        Click below to begin the multi-variable regression: 
         <button onClick = {initialize}  className=  " mt-10 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
 
     Begin
@@ -308,18 +360,22 @@ className="container flex flex-col items-center mt-10">
 <div>
 
 
-{meanScore > 0.75 && <p>
+{meanScore > 0.75 && meanScore != null &&
+
+
+
+<p className="container flex flex-col items-center mt-10 font-bold">
   
   Your data resulted in a mean CV score above 0.75, which means it fared well during the testing portion of model training!
   
   </p>}
-  { 0.5 < meanScore < 0.75 && <p>
+  { 0.5 < meanScore < 0.75 &&  meanScore != null && <p className="container flex flex-col items-center mt-10 font-bold">
   
   Your data resulted in a mean CV score between 0.5 and 0.75, which means it fared average during the testing portion of model training!
   
   </p>}
-  {meanScore < 0.5 && (
-  <div>
+  {meanScore < 0.5 && meanScore != null && (
+  <div className="container flex flex-col items-center mt-10 font-bold">
     <p>
       Your data resulted in a mean CV score below 0.5, which means it fared poorly during the testing portion of model training.
       Here are some common issues and possible reasons for the poor performance with your requested column:
