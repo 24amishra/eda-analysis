@@ -27,7 +27,10 @@ export default function Regress() {
       const [state,setState ] = useState(0)
       const [depth,setDepth ] = useState(null);
       const[sample,setSample] = useState(2);
-
+      const[variance,setVariance] = useState(null);
+      const[remove,setRemove] = useState(false);
+      const[model,setModel] = useState('Decision Tree Regression');
+      const[outlier,setOutlier] = useState(false);
       
 
 const router = useRouter();
@@ -88,11 +91,12 @@ const getData = async () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ var1, split,depth,sample }),
+        body: JSON.stringify({ var1, split,depth,sample,variance,remove,model,outlier }),
       });
 
        
       const data = await res.json();
+      
     setLoading(false);
       console.log(data)
       console.log(data.cross_val_scores);
@@ -100,6 +104,8 @@ const getData = async () => {
      setCross_val(data.cross_val_scores);
      setMeanScore(data.mean_score);
      setPred(data.prediction);
+     setVariance(data.variance);
+     console.log("Variance: " + data.variance);
      const lineData = Array.from({ length: 100 }, (_, i) => ({
       x: i,
       y: i,
@@ -122,23 +128,17 @@ const getData = async () => {
     }
   };
 
-  if(loading){
 
+const home = () =>{
 
-return(
+router.push('/')
 
-        
-    <div className="container flex justify-center items-center h-screen">
-        <div className="h-20"/>
-        <PacmanLoader color="#000000" />
-    
-    </div>
+}
+const mod = ()=>{
 
+router.push('/regression');
 
-)
-
-  }
-
+}
 
   const splitModel = () =>{
 
@@ -152,17 +152,29 @@ setSelect(true);
 
  
   
-    console.log("Sending to backend:", { var1, split });
+    console.log("Sending to backend:", { var1, split,remove ,model});
 
-    // setLoading(true);
+
+
+     setLoading(true);
 await getModel();
 
 //router.push('/eval');
 
   }
+  const handleClick = () =>{
+
+
+  //  setRemove(prev => !prev)
+  }
 
  
+const handleChange = ()=>{
 
+
+
+
+}
 
   return (
     
@@ -170,7 +182,14 @@ await getModel();
 <div className="container mx-auto flex flex-col items-center px-4 py-12 space-y-10">
 
 <div className="container flex flex-col items-center mt-10">
-        <h1>Select a variable to run a regression on.</h1>
+  <div className="container flex flex-col items-center mb-10">
+        <h1 className="text-center"> Please select a  variable for Decision Tree Regression</h1>
+        
+        
+        
+
+        </div>
+
 <div>
 
     {!select &&
@@ -202,7 +221,7 @@ await getModel();
 <div className="container flex flex-col items-center mt-10 ">
         {var1 == var2 &&
         <div className="container flex flex-col items-center mt-10 ">
-            <p>Please select a  variable for regression</p>
+            <p>Please select a  variable for</p><a href = {modal} className="font-bold text-underline"> Decision Tree Regression</a>
             <button  className= "focus:outline-none text-black bg-white-700 hover:bg-gray-400 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-gray-600 dark:hover:bg-gray -700 dark:focus:ring-gray-900">
             Confirm
     </button>
@@ -234,7 +253,7 @@ className="container flex flex-col items-center mt-10">
     
     Train Test Split?
     </motion.p>    
-  
+
 
     <div className="container flex flex-col items-center mt-10">
     <button onClick={() => setSplit("80-20")}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-2 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
@@ -246,10 +265,19 @@ className="container flex flex-col items-center mt-10">
     <button  onClick={() => setSplit("90-10")} className= "focus:outline-none text-black bg-white-700 hover:bg-green-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-2 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
           90-10
     </button>
-
+   
     {split == null  &&
     
+
+
 <div>
+
+
+
+
+
+
+
 
 <p>Please select an testing margin</p>
 <button onClick  = {() => {
@@ -263,8 +291,11 @@ className="container flex flex-col items-center mt-10">
 
 </div>
 
+
     }
 
+ { model == 'Decision Tree Regression'  && 
+<div>
 {split != null && 
     <div className="container flex flex-col items-center mt-10">
 
@@ -288,6 +319,7 @@ className="container flex flex-col items-center mt-10">
 <option>None</option>
 <option>5</option>
 <option>10</option>
+<option>15</option>
 
 
           </motion.select>
@@ -308,6 +340,7 @@ className="container flex flex-col items-center mt-10">
 <option>10</option>
 
 
+
           </motion.select>
 
 
@@ -318,22 +351,53 @@ className="container flex flex-col items-center mt-10">
 
 
 
-        Click below to begin the multi-variable regression: 
+
+
+
+
+
+
+
+          <div>
+          {/*here*/}
+          <div className = ' mb-10 container flex flex-row items-center mt-10'>
+          <input checked = {remove} onChange = {handleClick} id = 'remove' type = 'checkbox'/> 
+         <label htmlFor="remove" > Remove non-correlated columns from training?</label>
+
+</div>
+</div>
+
+{/* <a>Why?</a> */}
+
+
+
+
+        </div>
+}
+</div>
+}
+
+
+Click below to begin the multi-variable regression: 
         <button onClick = {initialize}  className=  " mt-10 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
 
     Begin
 </button>
-        </div>
-}
 
   </div>
 
+  {loading &&
+  <div>
 
+Please wait as the model loads...
 
+</div>
+
+  }
 
     </div>
     
-    
+  
     
     }
 
@@ -341,8 +405,10 @@ className="container flex flex-col items-center mt-10">
 </div>
 
         </div>
+       
         {error && <p className="text-red-500 mt-4">{message}</p>}
       </div>
+   
 
 <div className="container flex flex-col items-center mt-10">
 
@@ -369,7 +435,7 @@ className="container flex flex-col items-center mt-10">
   Your data resulted in a mean CV score above 0.75, which means it fared well during the testing portion of model training!
   
   </p>}
-  { 0.5 < meanScore < 0.75 &&  meanScore != null && <p className="container flex flex-col items-center mt-10 font-bold">
+  { 0.5 < meanScore && meanScore < 0.75 &&  meanScore != null && <p className="container flex flex-col items-center mt-10 font-bold">
   
   Your data resulted in a mean CV score between 0.5 and 0.75, which means it fared average during the testing portion of model training!
   
@@ -383,24 +449,38 @@ className="container flex flex-col items-center mt-10">
     <ul>
       <li><strong>Data Imbalance:</strong> If the dataset is heavily imbalanced, the model may struggle to generalize to the minority class.</li>
       <li><strong>Feature Quality:</strong> Ensure the features you're using are relevant and not noisy. Irrelevant or poorly chosen features can hurt model performance.</li>
-      <li><strong>Model Overfitting:</strong> Overfitting may occur if your model is too complex for the amount of data you have. Try simplifying the model or increasing the data size.</li>
+      <li><strong>Model Overfitting:</strong> Overfitting may occur if your model is too complex for the amount of data you have. Try increasing the data size.</li>
       <li><strong>Hyperparameter Tuning:</strong> The model might not be optimized. Tuning hyperparameters like learning rate, regularization, etc., might help improve performance.</li>
     </ul>
     <p>
       Try addressing these issues and rerun your model training to improve the results.
     </p>
+  
+  
+  
+  
+  
+  
   </div>
+
 )}
 
   
+<div className="container flex flex-col items-center">
+<button onClick = {home}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
 
+Go Home?
+</button>
+<button onClick = {mod}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
 
-
-
+Try another feature
+</button>
 
 
 
 </div>
+</div>
+
      
     </div>
   

@@ -14,6 +14,13 @@ import Spinner from "../load";
 import { ClipLoader } from "react-spinners";
 import { Dropdown } from "bootstrap";
 import HistogramChart from './graph.js';
+import ChatBot from "react-chatbotify";
+
+const MyComponent = () => {
+  return (
+    <ChatBot/>
+  );
+};
 
 const rock_salt = Rock_Salt({
     subsets :['latin'],
@@ -55,6 +62,9 @@ export default  function Loading(){
     const[length,setLength ] = useState(null);
     const[clean,setClean] = useState(true);
     const [histograms, setHistograms] = useState({});
+    const[query,setQuery] = useState("");
+    const[response,setResponse] = useState("");
+    const[outlier,setOutlier] = useState(0);
 
     
 
@@ -75,7 +85,11 @@ export default  function Loading(){
         setMessage("ERROR");
         setError(true);
 
+
       };
+
+
+      
    
         try {
             const res = await fetch('http://localhost:8000/data', { 
@@ -115,6 +129,8 @@ export default  function Loading(){
              setKeys(scrapeKey);
              setDigit(data.numerical);
              setPair(data.pairs)
+             setOutlier(data.outliers)
+             console.log(data.outliers);
              
              console.log(data.pairs)
              
@@ -203,6 +219,47 @@ useEffect(() => {
 }, [digit]);
 
 
+const getChat = async () =>{
+  console.log("Sending over"  + {query});
+try{
+  const res =  await fetch('http://localhost:8000/chatbot',{
+  
+  method:'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ query }),
+  
+  
+  });
+  const data = await res.json();
+  setResponse(data.response);
+  
+  
+  
+  
+  
+  
+        }catch(err){
+  
+  
+  console.log(err);
+        }
+
+      }
+
+
+
+
+
+
+
+
+
+
+
+
 useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -252,7 +309,7 @@ if (error){
 
     return( 
     
-    <div>
+    <div className="container flex flex-col mb-10">
     <p className="text-black size-lg">Something went wrong {error}
     <a href = '/' >Go back home here</a>
 
@@ -268,6 +325,47 @@ if (error){
     )
    
 }
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  console.log(query); 
+  getChat();
+};
+
+
+
+
+
+const getFile  = async () =>{
+    console.log("yo")
+    try {
+        const res = await fetch('http://localhost:8000/file', { 
+            method: 'GET',
+            credentials: 'include',
+      
+        }
+       
+    );
+
+    const blob = await res.blob();
+    
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cleaned_data.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+} 
+        
+        catch(err){
+
+
+console.log("error")
+        }
+    }
 
     if (loading){
 
@@ -457,60 +555,72 @@ viewport={{ once: true ,amount:0.5}}
 
 
  
-{corr == "Correlation Heatmap" && img && <img className="w-30 h-15" src={img} alt="Heatmap" />}
+{corr == "Correlation Heatmap" && img &&
+
+<motion.div initial={{ opacity: 0, y: 20 }}
+whileInView={{ opacity: 1, y: 0 }}
+transition={{ duration: 0.6 }}
+viewport={{ once: true ,amount:0.5}}
+className="container flex flex-col justify-center">
+<img className="w-100 h-50" src={img} alt="Heatmap" />
+
+</motion.div>
+
+
+
+
+
+
+}
 </div>
 </motion.div>
 <div className="h-20"/>
 
+
+
+
+
+
 <div className="container w-1/2 mx-auto rounded-xl p-6 mb-10">
 
+
+
+
 <script>This was all Chat GPT for designing this div</script>
+{corr === "Top Correlated Columns" && (
+  <ul className="space-y-6">
+    <motion.li
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true, amount: 0.1 }}
+      className="transition-transform duration-300 transform hover:scale-105 hover:shadow-lg rounded-xl px-6 py-4 text-lg text-white flex justify-between items-center "
+    >
+      <span className="font-semibold tracking-wide">1. {pair[0]}</span>
+    </motion.li>
 
-{corr == "Top Correlated Columns" &&
-    <ul className="">
-  
-  <motion.li
-  initial={{ opacity: 0, y: 20 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  viewport={{ once: true ,amount:0.1}}
+    <motion.li
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true, amount: 0.7 }}
+      className="transition-transform duration-300 transform hover:scale-105 hover:shadow-lg rounded-xl px-6 py-4 text-lg text-white flex justify-between items-center"
+    >
+      <span className="font-semibold tracking-wide">2. {pair[1]}</span>
+    </motion.li>
 
-  className="0 transition rounded-md px-4 py-2 text-lg text-white flex justify-between mb-10 items-center"
+    <motion.li
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true, amount: 0.7 }}
+      className="transition-transform duration-300 transform hover:scale-105 hover:shadow-lg rounded-xl px-6 py-4 text-lg text-white flex justify-between items-center "
+    >
+      <span className="font-semibold tracking-wide">3. {pair[2]}</span>
+    </motion.li>
+  </ul>
+)}
 
-  >
-         
-        
-          1. {pair[0]}
-       
-      
-        </motion.li>
-        <motion.li
-  initial={{ opacity: 0, y: 20 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  viewport={{ once: true,amount:0.7 }}
-
-  className=" transition rounded-md px-4 py-2 text-lg mb-10 text-white flex justify-between items-center"
-
-  >
-        2.  {pair[1]}
-     
-       </motion.li>
-       <motion.li
-  initial={{ opacity: 0, y: 20 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  viewport={{ once: true,amount:0.7 }}
-
-  className=" transition rounded-md px-4 py-2 text-lg text-white flex justify-between items-center"
-
-  >
-        3.  {pair[2]}
-     
-       </motion.li>
-      
-    </ul>
-}
 </div>
 
 
@@ -518,10 +628,15 @@ viewport={{ once: true ,amount:0.5}}
 
 
 
-    <div className="container flex justify-center">
+    <div className="container flex flex-col items-center justify-center">
  
-  
-    <motion.h3 className="justify-center">Table Head</motion.h3>
+    <hr className="w-full border-white" />
+
+    <motion.h3    initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true, amount: 0.7 }} className="justify-center">Table Head</motion.h3>
+    <p>A look into how the data is structured</p>
    </div>
     <div className="container w-50 rounded-lg">
 
@@ -550,6 +665,7 @@ viewport={{ once: true ,amount:0.5}}
 </Table>
 </div>
 
+<hr className="w-full border-white" />
 
     <p
       ref={textRef}
@@ -573,11 +689,71 @@ Clean Dataset?
 
 </h1>
 {length == null && <p> Please wait for the missing value checks to finish</p>}
-{length > 0  && <p> {length} Columns have over 40% of their data missing. Check the box below to create a clean, downloadable version of this file</p>
+{length > 0   && outlier > 0  &&
+<div>
+
+<p> {length} Columns have over 40% of their data missing. Check the box below to create a clean, downloadable version of this file</p>
+<p>There are {outlier} outlying value in youy dataset using IQR method.</p>
+ <div className="text-center space-y-4">
+ <p className="text-2xl font-semibold">
+   Click below to download your cleaned file.
+ </p>
+ <button
+   onClick={getFile}
+   className="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-6 py-3 transition duration-200"
+ >
+   Download Cleaned File
+ </button>
+</div>
+</div>
+
+ 
  }
- {length == 0 &&<p> No Columns have missing data!</p> }
+ {outlier == 0 && length == 0 &&<p> No Columns have missing data!</p> }
+ { outlier > 0 && 
+ 
  <div>
-<button onClick = {advance} className= " focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
+
+<p>There are {outlier} total outlying values detected using IQR method</p>
+ <div className="text-center space-y-4">
+ <p className="text-2xl font-semibold">
+   Click below to download your cleaned file.
+ </p>
+ <button
+   onClick={getFile}
+   className=" mt-10 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-6 py-3 transition duration-200"
+ >
+   Download Cleaned File
+ </button>
+</div>
+</div>
+ 
+ 
+ 
+ 
+ 
+ }
+ <div>
+{/* 
+<div className="text-bold container mt-10 mb-10 flex justify-center">
+
+<form  className = 'text-black' onSubmit={handleSubmit}>
+<input placeholder="Enter a query" onChange={(e) => setQuery(e.target.value)} value = {query} id = 'simple' type="text"></input>
+
+<button className="text-black mr-10 " type="submit">Submit Query</button>
+
+</form>
+
+
+
+{response}
+
+</div> */}
+
+
+
+
+<button onClick = {advance} className= " mt-10 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">
   <label>Continue to Advanced Analysis?</label> 
 </button>
 </div>

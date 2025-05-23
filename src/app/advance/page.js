@@ -33,36 +33,6 @@ export default function(){
 
 
 
-const getData = async () =>{
-    console.log("yo")
-    try {
-        const res = await fetch('http://localhost:8000/file', { 
-            method: 'GET',
-            credentials: 'include',
-      
-        }
-       
-    );
-
-    const blob = await res.blob();
-    
-    
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'cleaned_data.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-} 
-        
-        catch(err){
-
-
-console.log("error")
-        }
-    }
     //Lets add a streamlit component to visualize all columns in dataset. and allow for outlier caluculations>
 
 
@@ -90,17 +60,6 @@ router.push('/classify')
 <div className="min-h-screen bg-slate-800 text-white">
   <div className="container mx-auto flex flex-col items-center px-4 py-12 space-y-10">
 
-    <div className="text-center space-y-4">
-      <p className="text-2xl font-semibold">
-        Click below to download your cleaned file.
-      </p>
-      <button
-        onClick={getData}
-        className="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-6 py-3 transition duration-200"
-      >
-        Download Cleaned File
-      </button>
-    </div>
 
     <hr className="w-full border-white" />
 

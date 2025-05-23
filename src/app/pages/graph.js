@@ -1,7 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 const HistogramChart = ({ data, title }) => (
-  <div style={{ padding: '16px' }}>
+  <div style={{ padding: '16px' ,text:'white'}}>
     <h2>{title}</h2>
     <div style={{ width: 600 }}>
       <LineChart width={600} height={400} data={data}>

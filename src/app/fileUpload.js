@@ -65,13 +65,14 @@ if (file.type != "text/csv"){
             console.log(output);
 
           
-            setMessage('File uploaded successfully!');
+            setMessage(output.message);
             setColor("bg-purple-700")
             setFile(true);
             setCsv(true);
         } catch (err) {
             console.error('Error during file upload:', err);
             setMessage('Error uploading file.');
+            setCsv(false);
 
         }
 
@@ -97,20 +98,20 @@ if (file.type != "text/csv"){
  text-white'
         
         >
-        <div className="flex flex-col items-center font-inter   text-center">
-            <div className=' w-128 h-128 flex containe flex-col justify-center items-center bg-purple-400'>
+        <div className="flex flex-col items-center font-inter border-white   text-center">
+            <div className=' w-128 h-128 flex container flex-col justify-center items-center border-white bg-slate-800'>
       
   
     
       
         <input type="file" onChange={onFileChange} />
-            <button className= " focus:outline-none text-black bg-white-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" 
+            <button className= " focus:outline-none text-white bg-white-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" 
             onClick={onFileUpload}>Upload</button>
             
          
 
-       
-<div className={`focus:outline-none text-white ${color} hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900`}>
+ {!csv &&   
+<div className={`focus:outline-none text-white bg-gray-200 hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-900`}>
 
    
          
@@ -120,6 +121,19 @@ if (file.type != "text/csv"){
       >Begin Initial EDA</button>
        
        </div>
+}
+
+
+{csv && <div className={`focus:outline-none text-white ${color} hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900`}>
+
+   
+         
+       
+<button  type = 'submit'  onClick = {nextPage}
+
+>Begin Initial EDA</button>
+ 
+ </div>}
       </div>
       <p>Status: {message}</p>
 
@@ -129,6 +143,7 @@ if (file.type != "text/csv"){
     
         </div>
         </div>
+ 
     
     );
 };

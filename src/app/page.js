@@ -32,14 +32,14 @@ export default function Home() {
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></link>      
     <div className = "topnav text-lg  ">
-
-<div className=" min-h-screen  font-inter text-xl font-bold">
-    <TypeAnimation
-      sequence={["Automate EDA", 2000, "Enter a CSV dataset!", 2000]}
-      speed={50}
-      repeat={Infinity}
-    />
-    </div>
+ {/* Animated Heading */}
+ <div className="text-center text-stone-100 text-3xl sm:text-4xl font-bold">
+        <TypeAnimation
+          sequence={['Automate EDA', 2000, 'Enter a CSV dataset!', 2000]}
+          speed={50}
+          repeat={Infinity}
+        />
+      </div>
 
 <p className="font-inter text-l mt-10  ">  </p>
 
@@ -50,9 +50,10 @@ export default function Home() {
 
 </div>
 
-
+<div className="mb-10">
 
     <FileUpload/>
+    </div>
     </div>
   );
 }

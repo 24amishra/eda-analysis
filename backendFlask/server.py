@@ -21,9 +21,31 @@ from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 from flask import session
+from langchain.agents.agent_types import AgentType
+from langchain.chat_models import init_chat_model
+
+from langchain_openai import OpenAI
+from google import genai
+from pandasai import SmartDataframe
+
+import getpass
+import os
+import pandas as pd
+from langchain.agents.agent_types import AgentType
+from langchain.chat_models import init_chat_model
+from langchain_openai import OpenAI
+from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
+
+from dotenv import load_dotenv
+import os
+
+
+
+
 
 
 app = Flask(__name__)
+MAX_BYTES = 200000000
 
 CORS(app, origins=["http://localhost:3000"], supports_credentials=True,
   allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "OPTIONS"])
@@ -40,6 +62,8 @@ def get_data():
    # Get the file from the request
     
     file = request.files.get('file')
+
+
     
  
     # Load and use the model for prediction
@@ -53,10 +77,18 @@ def get_data():
     
     if (file):
         file_storage['file'] = file.read()
-
-        response = jsonify({"message": "File received", "filename": file.filename})
-        response.headers["Content-Type"] = "application/json"
-        return response, 200
+        
+        file_size = len(file_storage['file'])
+        print("Check")
+        print(file_size)
+        if file_size < MAX_BYTES:
+       
+            response = jsonify({"message": "File received", "filename": file.filename})
+            response.headers["Content-Type"] = "application/json"
+            return response, 200
+        else:
+            response = jsonify({"message": "Error. File must be under 200 MB","filename": file.filename})
+    
         
     
     
@@ -150,6 +182,23 @@ def check():
         top_corr_pairs =top_corr.index.tolist()
         top_corr_pairs =  top_corr_pairs[0:4]
         top_corr_pairs = [f"{a} & {b} : {c:.3f}" for (a, b), c in top_corr.items()]
+        outliers = []
+
+
+        for column in df.select_dtypes(include=['number']).columns:
+            q1 = df[column].quantile(0.25)
+            q3 = df[column].quantile(0.75)
+            iqr = q3 - q1
+    
+            for value in df[column].dropna().values:
+                if value > q3 + 1.5 * iqr or value < q1 - 1.5 * iqr:
+                    outliers.append((column, value))
+
+        print("Outliers:")
+
+        num = len(outliers)
+
+
 
 
         response = jsonify({
@@ -162,6 +211,8 @@ def check():
             'describe': describe,
             'numerical': num_col,
             'pairs':top_corr_pairs,
+            'outliers': num
+        
 
            # 'topCor': topCorr,
 
@@ -307,11 +358,91 @@ def graph():
         print(f"Error: {str()}")
         return jsonify({"error": "An error occurred while processing the file."}), 500
 
+@app.route('/chatbot',methods = ['GET','POST'])
+def chat():
+
+    file_data = file_storage.get('file')
+
+    try:
+        data =  request.get_json()
+
+        text = data.get("query")
+        df = pd.read_csv(BytesIO(file_data))
+        load_dotenv()  
+        openai_key = os.getenv("OPENAI_API_KEY")
+        #agent = create_pandas_dataframe_agent(OpenAI(api_key=openai_key,temperature=0), df, verbose=True,allow_dangerous_code=True)
+        llm = OpenAI(api_key=openai_key,temperature=0)
+
+        sdf = SmartDataframe(df, config={"llm": llm ,
+                                         
+        "use_error_correction_framework": True,  
+        "enable_cache": False,
+        "save_charts": False,})
+        response = sdf.chat("Using Python code," + text+ "Format in such a way that it is easily readable for users.",output_type='string')
+
+        
+
+        return jsonify({'response':response})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500        
 
 
 
 
 
+    
+
+
+@app.route('/net',methods = ['POST','GET'])
+def net():
+    file_data = file_storage.get('file')
+
+
+    df = pd.read_csv(BytesIO(file_data))
+  
+
+    df = df.loc[:, df.isnull().mean() < 0.4]
+    data =  request.get_json()
+    var1 = data.get("var1")
+    depth = data.get('depth')
+    sample = data.get('sample')
+
+    remove = data.get('remove')
+    if depth != None and depth != 'None':
+        depth = int(depth)
+    if sample != 2:
+        sample = float(sample)
+    if depth == 'None':
+        depth = None
+    
+    
+ 
+    
+    split_ratio_str = data.get("split")
+    y = df[var1]
+    X = df.drop(columns=[var1])
+    
+    for col in df.columns:
+        if df[col].dtype != 'int64' and df[col].dtype != 'float':
+            df = df.drop(columns=col)
+    regressor = DecisionTreeRegressor(max_depth = depth,random_state = 0,min_samples_split=sample)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1 - 0 ,random_state=42)
+
+    regressor.fit(X_train, y_train)
+    scores = cross_val_score(regressor, X, y, cv=10)
+    y1 = regressor.predict(X_test)
+    print(y1)
+    y1 =  y1.tolist()
+    y_test = y_test.tolist() 
+
+    prediction = [{'x': y1[val],'y' : y_test[val]} for val in range(0,len(y1))]
+
+
+
+
+
+    
 @app.route('/columns',methods = ['POST','GET'])
 def drop():
     file_data = file_storage.get('file')
@@ -325,8 +456,17 @@ def drop():
     var1 = data.get("var1")
     depth = data.get('depth')
     sample = data.get('sample')
-    
+    outlier = data.get('outlier')
 
+    remove = data.get('remove')
+    if depth != None and depth != 'None':
+        depth = int(depth)
+    if sample != 2:
+        sample = float(sample)
+    if depth == 'None':
+        depth = None
+    
+    
  
     
     split_ratio_str = data.get("split")
@@ -346,9 +486,16 @@ def drop():
 
 
     df = pd.read_csv(BytesIO(file_data))
+
+
+
+
+
+
     # Read file and form data
     target = session.get('target')
     print("WHAT IS TARGET")
+    variance = df[target].var()
     
     if target is None:
         return jsonify({"error": "Target variable is not set. Please select a target variable first."}), 400
@@ -361,9 +508,32 @@ def drop():
         if df[col].dtype != 'int64' and df[col].dtype != 'float':
             df = df.drop(columns=col)
 
+    
+   
+   
+   
     y = df[target]
     X = df.drop(columns=[target])
+    if outlier:
+        q1 = df[target].quantile(0.25)
+        q3 = df[target].quantile(0.75)
+        iqr = q3 - q1
+    
+        mask = (df[target] >=  q1 - 1.5 * iqr) & (df[target] <=  q3 + 1.5 * iqr)
+
+
+        y = df[target][mask]
+        X = df.drop(columns=[target])[mask]
+
+    ## remove all columns under 0.2 correlation to remove noise
+    if remove:
+        correlations = X.apply(lambda col: col.corr(y))
+        threshold = 0.2
+        correlated_features = correlations[correlations.abs() >= threshold].index
+        X = X[correlated_features]
    
+
+       
     regressor = DecisionTreeRegressor(max_depth = depth,random_state = 0,min_samples_split=sample)
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1 - split_ratio, random_state=42)
@@ -382,6 +552,7 @@ def drop():
         "cross_val_scores": scores.tolist(),
         "mean_score": scores.mean(),
         "prediction": prediction,
+        "variance": variance
         
     })
    
