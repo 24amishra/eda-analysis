@@ -21,7 +21,7 @@ const FileUpload = () => {
     const [probability, setProbability] = useState(null);
     const[csv,setCsv] = useState(null);
     const[color,setColor] = useState("bg-gray-100");
-
+const[size,setSize] = useState(true);
 
 
     // Handle file selection
@@ -69,10 +69,17 @@ if (file.type != "text/csv"){
             setColor("bg-purple-700")
             setFile(true);
             setCsv(true);
+            setSize(true)
+            if (res.status == 400){
+                setSize(false);
+            }
+
+
         } catch (err) {
             console.error('Error during file upload:', err);
             setMessage('Error uploading file.');
             setCsv(false);
+            setSize(false)
 
         }
 
@@ -124,7 +131,7 @@ if (file.type != "text/csv"){
 }
 
 
-{csv && <div className={`focus:outline-none text-white ${color} hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900`}>
+{csv && size &&  <div className={`focus:outline-none text-white ${color} hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900`}>
 
    
          

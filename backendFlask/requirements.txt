@@ -1,0 +1,33 @@
+# Core packages
+numpy==1.24.4
+pandas==1.5.3
+
+scipy
+matplotlib
+seaborn
+Pillow
+
+# Flask and CORS
+Flask
+flask-cors
+
+# PyTorch
+torch
+torchvision
+
+# scikit-learn
+scikit-learn
+
+# Langchain + OpenAI
+langchain
+langchain-openai
+langchain-experimental
+
+# Google Generative AI (Gemini)
+google-generativeai
+
+# pandasai
+pandasai
+
+# python-dotenv for env variable loading
+python-dotenv

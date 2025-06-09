@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from flask_cors import CORS
 import torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
@@ -27,7 +26,7 @@ from langchain.chat_models import init_chat_model
 from langchain_openai import OpenAI
 from google import genai
 from pandasai import SmartDataframe
-
+import scipy as sp
 import getpass
 import os
 import pandas as pd
@@ -45,6 +44,7 @@ import os
 
 
 app = Flask(__name__)
+app.secret_key = 'i2jwfi'  
 MAX_BYTES = 200000000
 
 CORS(app, origins=["http://localhost:3000"], supports_credentials=True,
@@ -53,7 +53,6 @@ file_storage = {}
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True  # Only if using HTTPS
 
-app.secret_key = 'i2jwfi'  
 matplotlib.use('Agg')
 
 @app.route('/server', methods=['POST'])
@@ -83,11 +82,12 @@ def get_data():
         print(file_size)
         if file_size < MAX_BYTES:
        
-            response = jsonify({"message": "File received", "filename": file.filename})
+            response = jsonify({"message": "File received successfully!", "filename": file.filename})
             response.headers["Content-Type"] = "application/json"
             return response, 200
         else:
             response = jsonify({"message": "Error. File must be under 200 MB","filename": file.filename})
+            return response,400
     
         
     
@@ -101,6 +101,65 @@ def get_data():
         'message': 'File upload failed',
        
     }), 200
+
+@app.route('/corr', methods=['POST'])
+
+
+
+def corr():
+    file_data = file_storage.get('file')
+    
+    df = pd.read_csv(BytesIO(file_data))
+
+    try: 
+        data =  request.get_json()
+        corr_matrix = df.corr(numeric_only=True)
+
+        var1 = data.get("var1")
+        top_corr = (
+        corr_matrix
+    .where(~np.eye(corr_matrix.shape[0], dtype=bool))  # remove self-correlation
+    .abs()
+    .unstack()
+    .dropna()
+    .sort_values(ascending=False)
+    .drop_duplicates()
+)
+        top_corr_pairs =top_corr.index.tolist()
+        var1_corrs = {
+         corr
+        for (a, b), corr in top_corr.items()
+        if var1 in (a, b)
+    }
+        var1_corrs = list(var1_corrs)
+
+    
+
+
+        
+        
+
+
+
+
+
+    except:
+        print("error")
+    return jsonify({"correlations": var1_corrs})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -143,6 +202,7 @@ def check():
         types = df.dtypes
         columns = list(df.columns)
         num_col = []
+        
 
     
         
@@ -210,6 +270,7 @@ def check():
             'overview': overview,
             'describe': describe,
             'numerical': num_col,
+            
             'pairs':top_corr_pairs,
             'outliers': num
         
@@ -457,6 +518,7 @@ def drop():
     depth = data.get('depth')
     sample = data.get('sample')
     outlier = data.get('outlier')
+    param = data.get('param')
 
     remove = data.get('remove')
     if depth != None and depth != 'None':
@@ -514,6 +576,8 @@ def drop():
    
     y = df[target]
     X = df.drop(columns=[target])
+    X = df[param]
+    print(X)
     if outlier:
         q1 = df[target].quantile(0.25)
         q3 = df[target].quantile(0.75)

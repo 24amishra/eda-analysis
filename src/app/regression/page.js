@@ -6,6 +6,8 @@ import { PacmanLoader } from "react-spinners";
 import { ScatterChart } from "recharts";
 import ScatterPlot from "./graph";
 import Example from "../modal";
+import { TypeAnimation } from "react-type-animation";
+
 
 
 
@@ -31,6 +33,11 @@ export default function Regress() {
       const[remove,setRemove] = useState(false);
       const[model,setModel] = useState('Decision Tree Regression');
       const[outlier,setOutlier] = useState(false);
+      const[listPar,setListPar] = useState([]);
+      const [faded, setFaded] = useState({});
+      const[param,setParam] = useState([]);
+      const[ corr,setCorr] = useState();
+
       
 
 const router = useRouter();
@@ -52,11 +59,12 @@ const getData = async () => {
       }
 
 
-     
      setColumn(data.columns);
    
       setDigit(data.numerical);
-     
+      if (data.numerical.length > 0) {
+        setVar1(data.numerical[0]);
+      }     
      
       
   }catch(error){
@@ -80,6 +88,40 @@ const getData = async () => {
   
 }, []);
 
+const getCorr = async() =>{
+
+try{
+
+
+
+const res = await fetch('http://localhost:8000/corr', {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ var1 }),
+});
+
+const data = await res.json();
+setCorr(data.correlations);
+
+console.log(data.correlations);
+
+
+
+}
+catch (error){
+
+setError(error);
+
+
+
+}
+
+
+}
+
 
 
   const getModel = async () => {
@@ -91,7 +133,7 @@ const getData = async () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ var1, split,depth,sample,variance,remove,model,outlier }),
+        body: JSON.stringify({ var1, split,depth,sample,variance,remove,model,outlier,param }),
       });
 
        
@@ -144,6 +186,17 @@ router.push('/regression');
 
 setSelect(true);
 
+const valueToRemove = var1;
+const index = digit.indexOf(var1);
+
+if (index > -1) {
+  digit.splice(index, 1); // Removes 1 element at the found index
+}
+
+getCorr();
+
+
+
 
   }
 
@@ -167,247 +220,250 @@ await getModel();
 
   //  setRemove(prev => !prev)
   }
+if (loading){
 
- 
-const handleChange = ()=>{
-
-
-
+console.log(corr)
 
 }
+if (digit == null){
+  setDigit([])
+}
+
+
+
+const handleSub = (col) => {
+console.log(digit)
+  setFaded((prev) => ({ ...prev, [col]: true }));
+  setParam((prev) => ([...prev, col,  ]));
+  
+  
+};
 
   return (
     
 <div className="min-h-screen bg-slate-800 text-white">
-<div className="container mx-auto flex flex-col items-center px-4 py-12 space-y-10">
+<div className="container mx-auto flex flex-col items-center px-4 py-4 space-y-10">
 
-<div className="container flex flex-col items-center mt-10">
-  <div className="container flex flex-col items-center mb-10">
-        <h1 className="text-center"> Please select a  variable for Decision Tree Regression</h1>
-        
-        
-        
+<div className="flex flex-col items-center ">
+  <h1 className="text-center">Please select a variable for Decision Tree Regression</h1>
 
-        </div>
-
-<div>
-
-    {!select &&
-    <div>
-        <motion.select
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, amount: 1 }}
-          onChange = {(e) => setVar1(e.target.value)}
-          className="mb-4 ml px-4 py-2 border rounded-lg bg-gray-500 shadow-md focus:outline-none"
-
-        >
-    
-          {digit.length > 0 &&
-            digit.map((col) => (
-              <option key={col} value={col}>
-                {col}
-              </option>
-            ))}
-
-        </motion.select>
-
-        
-</div>
-        }
-
-
-<div className="container flex flex-col items-center mt-10 ">
-        {var1 == var2 &&
-        <div className="container flex flex-col items-center mt-10 ">
-            <p>Please select a  variable for</p><a href = {modal} className="font-bold text-underline"> Decision Tree Regression</a>
-            <button  className= "focus:outline-none text-black bg-white-700 hover:bg-gray-400 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-gray-600 dark:hover:bg-gray -700 dark:focus:ring-gray-900">
-            Confirm
-    </button>
-    </div>
-
-        }
-   {var1 != var2 &&
-        <div className="container flex flex-col items-center mt-10 ">
-          
-            <button onClick = {splitModel}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
-            Confirm
-    </button>
-    </div>
-
-        }
-</div>
-
-<div>
-
-{select && 
-<div>
-<motion.p
-initial={{ opacity: 0, y: 20 }}
-whileInView={{ opacity: 1, y: 0 }}
-transition={{ duration: 0.6 }}
-viewport={{ once: true, amount: 1 }}
-className="container flex flex-col items-center mt-10">
-    
-    
-    Train Test Split?
-    </motion.p>    
-
-
-    <div className="container flex flex-col items-center mt-10">
-    <button onClick={() => setSplit("80-20")}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-2 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
-           80-20
-    </button>
-    <button onClick={() => setSplit("70-30")}  className= "focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-2 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
-          70-30
-    </button>
-    <button  onClick={() => setSplit("90-10")} className= "focus:outline-none text-black bg-white-700 hover:bg-green-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-2 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
-          90-10
-    </button>
-   
-    {split == null  &&
-    
-
-
-<div>
-
-
-
-
-
-
-
-
-<p>Please select an testing margin</p>
-<button onClick  = {() => {
-    setPopup(true);  
-    setState(2);   }
-
-
-        }className="text-sm underline text-blue-300">
-          (What does this mean?)
-        </button>
-
-</div>
-
-
-    }
-
- { model == 'Decision Tree Regression'  && 
-<div>
-{split != null && 
-    <div className="container flex flex-col items-center mt-10">
-
-        {split} % selected.
-
-
-
-        <p>Select Hyperparameters</p>
-
-
-     <p>Max Depth</p>
-        <motion.select
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, amount: 1 }}
-          onChange = {(e) => setDepth(e.target.value)}
-          className="mb-4 ml px-4 py-2 border rounded-lg bg-gray-500 shadow-md focus:outline-none"
-
-        >
-<option>None</option>
-<option>5</option>
-<option>10</option>
-<option>15</option>
-
-
-          </motion.select>
-      <p>   Min Sample Split</p> 
+  <div className="flex flex-col justify-center items-center min-h-[60vh]">
+    {!select && (
       <motion.select
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, amount: 1 }}
-          onChange = {(e) => setSample(e.target.value)}
-          className="mb-4 ml px-4 py-2 border rounded-lg bg-gray-500 shadow-md focus:outline-none"
+        initial={{ opacity: 0, y: 20 }}
 
-        >
-<option>2</option>
-<option>0.01</option>
-<option>0.05</option>
-<option>0.1</option>
-<option>10</option>
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 1 }}
+        onChange={(e) => setVar1(e.target.value)}
+        className="mb-4 px-4 py-2 border rounded-lg bg-gray-500 text-white shadow-md focus:outline-none"
+      >
+        {digit.map((col) => (
+          <option key={col} value={col}>
+            {col}
+          </option>
+        ))}
+      </motion.select>
+    )}
+  </div>
 
+  <div className="">
+    {var1 === var2 ? (
+      <p>
+        Please select a variable for
+        <a href={modal} className="font-bold underline ml-1">
+          Decision Tree Regression
+        </a>
+      </p>
+    ) : (
+      <button
+        onClick={splitModel }
+        className="focus:outline-none text-black bg-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 mb-4"
+      >
+        Confirm
+      </button>
+    )}
 
-
-          </motion.select>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          <div>
-          {/*here*/}
-          <div className = ' mb-10 container flex flex-row items-center mt-10'>
-          <input checked = {remove} onChange = {handleClick} id = 'remove' type = 'checkbox'/> 
-         <label htmlFor="remove" > Remove non-correlated columns from training?</label>
-
-</div>
-</div>
-
-{/* <a>Why?</a> */}
-
-
-
-
-        </div>
-}
-</div>
-}
-
-
-Click below to begin the multi-variable regression: 
-        <button onClick = {initialize}  className=  " mt-10 focus:outline-none text-black bg-white-700 hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue -700 dark:focus:ring-blue-900">
-
-    Begin
-</button>
 
   </div>
 
-  {loading &&
-  <div>
+{ digit != null && corr != null && 
 
-Please wait as the model loads...
+  <div
+   
+    className="flex flex-col items-center justify-center min-h-screen"
+  >
+    <p className="font-bold text-lg mb-4">Chosen parameters:</p>
+    <div className="max-h-64 overflow-y-auto w-full flex border border-white justify-center">
+      <div className="flex flex-wrap gap-4 mt-4 ml-10">
+        {param.map((col) => (
+          <button
+            key={col}
+            className="text-black bg-gray-200 w-64 h-32 rounded-xl shadow-lg border border-gray-300 flex items-center justify-center"
+          >
+            {col}
+          </button>
+        ))}
+      </div>
+    </div>
 
-</div>
+    <p className="font-bold text-lg mt-10">Select any parameters to use for regression:</p>
+    <div className="max-h-64 overflow-y-auto w-full flex border border-white justify-center">
+     
+     {
+      
+      
+      
+      
+      
+      <div className="flex  flex-wrap gap-4 mt-4 items-center justify-center">
+        {digit.map((col,idx) => (
+         
+
+
+        (
+          <button
+            onClick={() => handleSub(col)}
+            key={col}
+            className={`text-black  ${
+              corr[idx] > 0.7
+          ? 'bg-green-200'
+          : corr[idx] > 0.5
+          ? 'bg-yellow-200'
+          : 'bg-red-200'
+            } w-64 h-32 rounded-xl shadow-lg border border-gray-300 flex items-center justify-center transition-opacity duration-700 ${
+              faded[col] ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
+          >
+
+
+
+            {col}: {corr[idx]}
+          </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+         )
+        ))}
+      
+      </div>
+}
+    </div>
+      
+  </div>
+
+
 
   }
 
+  {select && (
+    <div className="mt-10  flex flex-col items-center">
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 1 }}
+        className="mb-4"
+      >
+        Train Test Split?
+      </motion.p>
+
+      <div className="flex gap-4 mb-4">
+        {["80-20", "70-30", "90-10"].map((ratio) => (
+          <button
+            key={ratio}
+            onClick={() => setSplit(ratio)}
+            className="focus:outline-none text-black bg-white hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+          >
+            {ratio}
+          </button>
+        ))}
+      </div>
+
+      {split === null && (
+        <div className="text-sm text-center">
+          <p>Please select a testing margin</p>
+          <button
+            onClick={() => {
+              setPopup(true);
+              setState(2);
+            }}
+            className="underline text-blue-300"
+          >
+            (What does this mean?)
+          </button>
+        </div>
+      )}
+
+      {model === "Decision Tree Regression" && split && (
+        <div className="mt-10 flex flex-col items-center">
+          <p className="mb-2">{split}% selected. Select Hyperparameters</p>
+
+          <label className="mb-1">Max Depth</label>
+          <motion.select
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true, amount: 1 }}
+            onChange={(e) => setDepth(e.target.value)}
+            className="mb-4 px-4 py-2 border rounded-lg bg-gray-500 text-white shadow-md"
+          >
+            <option>None</option>
+            <option>5</option>
+            <option>10</option>
+            <option>15</option>
+          </motion.select>
+
+          <label className="mb-1">Min Sample Split</label>
+          <motion.select
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true, amount: 1 }}
+            onChange={(e) => setSample(e.target.value)}
+            className="mb-4 px-4 py-2 border rounded-lg bg-gray-500 text-white shadow-md"
+          >
+            <option>2</option>
+            <option>0.01</option>
+            <option>0.05</option>
+            <option>0.1</option>
+            <option>10</option>
+          </motion.select>
+
+          
+        </div>
+      )}
+
+      <p className="mt-10">Click below to begin the multi-variable regression:</p>
+      <button
+        onClick={initialize}
+        className="mt-4 focus:outline-none text-black bg-white hover:bg-blue-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5"
+      >
+        Begin
+      </button>
+
+      {loading && (
+        <div className="mt-6 text-center">
+          <p>Please wait as the model loads</p>
+          <TypeAnimation sequence={['', 2000, '...', 2000]} speed={50} repeat={Infinity} />
+        </div>
+      )}
     </div>
-    
-  
-    
-    }
+  )}
 
-
+  {error && <p className="text-red-500 mt-4">{message}</p>}
 </div>
 
-        </div>
-       
-        {error && <p className="text-red-500 mt-4">{message}</p>}
-      </div>
    
 
 <div className="container flex flex-col items-center mt-10">

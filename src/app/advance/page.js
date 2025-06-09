@@ -74,7 +74,7 @@ router.push('/classify')
 
 
         }className="text-sm underline text-blue-300">
-          (What does this mean?)
+          {/* (What does this mean?) */}
         </button>
         <Example isVisible={popup} onClose = {() => setPopup(false)} whichState = {state} />
       </div>
@@ -85,12 +85,7 @@ router.push('/classify')
         >
           Regression
         </button>
-        <button
-          onClick={classify}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition duration-200"
-        >
-          Classification
-        </button>
+        
       </div>
     </div>
 

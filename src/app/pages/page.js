@@ -373,7 +373,7 @@ console.log("error")
        //<Spinner/>
        return(
         
-        <div className=" container flex justify-center items-center h-screen">
+        <div className=" container flex justify-center items-center min-h-screen">
             <div className="h-20"/>
         <ClipLoader color="#36d7b7" size={100} />
         
@@ -429,7 +429,7 @@ console.log("error")
             </main>
     <main className= {inter.className}>
 
-<div className="container flex justify-center outline-black mt-10" >
+<div className="container flex justify-center outline-black" >
 
 
 
@@ -485,7 +485,7 @@ console.log("error")
     </div>
 
     
-    <div className="container flex flex-row items-center mt-10">
+    <div className="container flex flex-row items-center mt-4">
   
 
   
